@@ -1,4 +1,5 @@
 # optic-clp-release
+Always can run in Linux system.
 
 OPTIC
 -----

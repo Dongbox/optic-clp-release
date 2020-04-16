@@ -1,0 +1,108 @@
+OPTIC
+-----
+
+This package contains OPTIC, a planner for use in problems where plan cost is
+determined by preferences or time-dependent goal-collection costs.  For more
+details, see the paper "Temporal Planning with Preferences and Time-Dependent 
+Continuous Costs", J. Benton, A. J. Coles, and A. I. Coles, ICAPS 2012.
+
+Build
+-----
+
+This distribution contains precompiled object files for OPTIC, and precompiled
+static libraries for the CBC MIP solver.  As the licence applied to CBC is
+incompatible with the GPL, you must type:
+
+make
+
+...to link them together, producing optic-clp.
+
+Note that optic-clp does not have the full functionality of OPTIC available,
+it does not function well in problems with Preferences, and the TIL abstraction
+functionality may not work reliably.  It is nonetheless useful as in the
+absence of these, it is generally faster than optic-cplex.
+
+For further details of TIL abstraction, see "Automated  Planning for Liner 
+Shipping Fleet Repositioning", K. Tierney, A. J. Coles, A. I. Coles, C. Kroer,
+A. Britt, and R. M. Jensen, ICAPS 2012.
+
+Running
+-------
+
+optic-clp domain.pddl problem.pddl
+
+This runs OPTIC on the given domain and problem file, carrying on search
+after the first solution in an attempt to optimise quality. If you want to
+ignore solution costs and stop after the first solution, run:
+
+optic-clp -N domain.pddl problem.pddl
+
+Or, if you have an upper-bound on plan cost, run:
+
+optic-clp -n<bound> domain.pddl problem.pddl
+
+If you wish to insist that each solution has to be at least 10 better than
+the last found, run:
+
+optic-clp '->10' domain.pddl problem.pddl
+
+Note that the planner does not, itself, limit its time and/or memory usage.
+Apply these by using the relevant shell commands beforehand, e.g.:
+
+bash
+ulimit -t 1800
+ulimit -v 4000000
+./optic-clp domain.pddl problem.pddl
+
+
+...will limit the planner to 30 minutes of CPU and 4GiB of memory.
+
+
+Feedback
+--------
+
+If you do something exciting with OPTIC, do let us know.  If you tried to do 
+something with it, but it failed, you may have found a bug.  In common with
+POPF, the three most likely sources of bugs are:
+
+The three most common causes of bugs (over 90% of bug reports) are:
+
+- Using ADL. ADL is supported in the conditions of preferences, in the
+  time-dependent costs of goal-collection actions, and one or two other niche
+  cases.  We've attempted to make the planner degrade gracefully, but there are
+  still cases where it will report problems using ADL as being unsolvable.
+  Check there are no negative preconditions in your domain.
+  
+- Domain modelling bugs. OPTIC and POPF support the full start--end semantics
+  of PDDL 2.1, and self-overlapping actions, so errors in the temporal
+  placement of preconditions and effects (at start, at end etc.) are more
+  likely to cause issues with POPF than with other planners. For instance, if
+  a 'move' action is written (erroneously) as deleting the old location at the
+  end (rather than at the start), then POPF will consider concurrent move 
+  actions for the same vehicle; whereas planners which do not make as clear a 
+  distinction between the start and end-points of durative actions would not 
+  consider this. Thus, in domains with errors such as this, POPF might have to
+  consider a far larger search space than other temporal planners.
+
+- If the plans don't validate, ensure you are passing the '-t 0.001' flag to
+  VAL: the planner uses an epsilon value of 0.001, smaller than the default
+  0.01 value used in VAL.
+
+If none of those apply, email as small a possible domain and problem file
+that cause the error you're observing to Andrew Coles:
+firstname.lastname@kcl.ac.uk
+
+
+Licence
+-------
+
+OPTIC is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+OPTIC is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+

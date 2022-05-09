@@ -1,5 +1,6 @@
 # optic-clp-release
 Always can run in Linux system.
+Tested in Ubuntu20, 18, 16.
 
 OPTIC
 -----
